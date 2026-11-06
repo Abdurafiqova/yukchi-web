@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-page font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-orange/20;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1180px] px-5 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-[15px] font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-orange text-white hover:bg-orange-hover;
+  }
+
+  .btn-navy {
+    @apply btn bg-navy text-white hover:bg-navy-deep;
+  }
+
+  .btn-ghost {
+    @apply btn border border-line-strong bg-white text-ink hover:border-navy hover:text-navy;
+  }
+
+  .card {
+    @apply rounded-card border border-line bg-surface shadow-card;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-3/70 focus:border-navy focus:ring-2 focus:ring-navy/10;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-ink-2;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-navy-soft px-3 py-1 text-[13px] font-medium text-navy;
+  }
+
+  .chip-warm {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-orange-soft px-3 py-1 text-[13px] font-medium text-orange-deep;
+  }
+
+  .link-muted {
+    @apply text-ink-2 transition-colors hover:text-navy;
+  }
+}
