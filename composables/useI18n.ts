@@ -68,6 +68,30 @@ const MONTHS: Record<Locale, string[]> = {
   en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 };
 
+// Hosting builds in UTC while visitors browse from any timezone; pinning the
+// display zone keeps prerendered HTML and client render identical.
+const DISPLAY_TZ = 'Asia/Tashkent';
+
+function zonedParts(iso: string) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: DISPLAY_TZ,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(new Date(iso));
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? '';
+  return {
+    day: Number(value('day')),
+    month: Number(value('month')) - 1,
+    year: Number(value('year')),
+    time: `${value('hour')}:${value('minute')}`,
+  };
+}
+
 export function useI18n() {
   const cookie = useCookie<Locale>(LOCALE_COOKIE, {
     default: () => 'uz',
@@ -80,6 +104,10 @@ export function useI18n() {
   );
 
   const locale = computed<Locale>(() => state.value);
+
+  // Frozen during prerender and shipped in the payload, so "2 kun oldin"
+  // labels match between the built HTML and the browser.
+  const renderNow = useState<number>('yukchi-render-now', () => Date.now());
 
   function setLocale(next: Locale) {
     state.value = next;
@@ -151,21 +179,22 @@ export function useI18n() {
     if (!iso) return '—';
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '—';
-    return `${date.getDate()} ${MONTHS[locale.value][date.getMonth()]} ${date.getFullYear()}`;
+    const z = zonedParts(iso);
+    return `${z.day} ${MONTHS[locale.value][z.month]} ${z.year}`;
   }
 
   function formatDateTime(iso: string | null | undefined) {
     if (!iso) return '—';
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '—';
-    const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    const day = locale.value === 'uz' ? `${date.getDate()}-${MONTHS.uz[date.getMonth()]}` : `${date.getDate()} ${MONTHS[locale.value][date.getMonth()]}`;
-    return `${day}, ${time}`;
+    const z = zonedParts(iso);
+    const day = locale.value === 'uz' ? `${z.day}-${MONTHS.uz[z.month]}` : `${z.day} ${MONTHS[locale.value][z.month]}`;
+    return `${day}, ${z.time}`;
   }
 
   function relativeTime(iso: string | null | undefined) {
     if (!iso) return '';
-    const diff = Date.now() - new Date(iso).getTime();
+    const diff = renderNow.value - new Date(iso).getTime();
     const minutes = Math.max(1, Math.round(diff / 60000));
     if (minutes < 60) return t('rel.minutes', { n: minutes });
     const hours = Math.round(minutes / 60);
@@ -179,7 +208,7 @@ export function useI18n() {
     if (!iso) return '';
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '';
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return zonedParts(iso).time;
   }
 
   return {
