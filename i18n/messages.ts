@@ -241,6 +241,9 @@ const uz = {
     'Davom etish orqali foydalanish shartlari va maxfiylik siyosatiga rozilik bildirasiz.',
   'login.errorSend': 'Kod yuborishda xatolik. Raqamni tekshiring.',
   'login.errorCode': 'Kod xato. Qayta urinib ko‘ring.',
+  'demo.noticeTitle': 'Bu demo versiya',
+  'demo.noticeText':
+    "Sayt statik rejimda ishlaydi: yuk e'lonlari va sahifalar ochiq, kirish esa hozircha o'chirilgan. SMS va shaxsiy hisob real API ulanganda ishlaydi.",
   'login.seoTitle': 'Kirish — Yukchi.uz',
   'login.seoDescription':
     "Yukchi.uz ga telefon raqam orqali kiring. Yuk joylash yoki haydovchi bilan bog'lanish uchun.",
@@ -600,6 +603,9 @@ const ru: Record<MessageKey, string> = {
     'Продолжая, вы соглашаетесь с условиями использования и политикой конфиденциальности.',
   'login.errorSend': 'Ошибка отправки кода. Проверьте номер.',
   'login.errorCode': 'Неверный код. Попробуйте ещё раз.',
+  'demo.noticeTitle': 'Это демо-версия',
+  'demo.noticeText':
+    'Сайт работает в статическом режиме: объявления и страницы доступны, вход пока отключён. SMS и личный кабинет заработают после подключения реального API.',
   'login.seoTitle': 'Вход — Yukchi.uz',
   'login.seoDescription':
     'Войдите в Yukchi.uz по номеру телефона, чтобы размещать грузы и связываться с водителями.',
@@ -957,6 +963,9 @@ const en: Record<MessageKey, string> = {
     'By continuing you agree to the terms of use and privacy policy.',
   'login.errorSend': 'Failed to send the code. Check the number.',
   'login.errorCode': 'Incorrect code. Please try again.',
+  'demo.noticeTitle': 'This is a demo',
+  'demo.noticeText':
+    'The site runs in static mode: cargo listings and pages work, sign-in is disabled for now. SMS and your account activate once the real API is connected.',
   'login.seoTitle': 'Log in — Yukchi.uz',
   'login.seoDescription':
     'Log in to Yukchi.uz with your phone number to post cargos and contact drivers.',

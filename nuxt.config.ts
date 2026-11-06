@@ -3,6 +3,24 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss'],
 
+  runtimeConfig: {
+    public: {
+      // Static hosting has no /api server, so sign-in is blocked on Vercel.
+      demoMode: process.env.NUXT_PUBLIC_DEMO_MODE === 'true',
+    },
+  },
+
+  nitro: {
+    preset: 'static',
+    prerender: {
+      crawlLinks: true,
+      routes: ['/', '/yuklar'],
+      // Query links (/kirish?next=..., /yuklar?qidiruv=...) are the same pages
+      // as their clean URLs; prerendering them writes '?'/'=' into file paths.
+      ignore: [/[?#]/],
+    },
+  },
+
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
   },

@@ -4,10 +4,16 @@
       <div class="card p-7">
         <div class="flex items-center justify-between">
           <span class="grid h-11 w-11 place-items-center rounded-2xl bg-orange text-lg font-extrabold text-white">Y</span>
-          <span class="text-[12px] font-semibold uppercase tracking-wider text-ink-3">{{ t('login.step', { step, total: 2 }) }}</span>
+          <span v-if="!demoMode" class="text-[12px] font-semibold uppercase tracking-wider text-ink-3">{{ t('login.step', { step, total: 2 }) }}</span>
         </div>
 
-        <template v-if="step === 1">
+        <div v-if="demoMode" class="mt-5">
+          <h1 class="text-[24px] font-extrabold leading-tight text-navy">{{ t('demo.noticeTitle') }}</h1>
+          <p class="mt-1.5 text-sm text-ink-2">{{ t('demo.noticeText') }}</p>
+          <NuxtLink to="/yuklar" class="btn-primary mt-5 w-full">{{ t('nav.cargos') }}</NuxtLink>
+        </div>
+
+        <template v-else-if="step === 1">
           <h1 class="mt-5 text-[24px] font-extrabold leading-tight text-navy">{{ t('login.title') }}</h1>
           <p class="mt-1.5 text-sm text-ink-2">{{ t('login.subtitle') }}</p>
 
@@ -98,6 +104,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const { setSession, loggedIn } = useAuth();
+const demoMode = useRuntimeConfig().public.demoMode;
 
 const step = ref(1);
 const fullName = ref('');

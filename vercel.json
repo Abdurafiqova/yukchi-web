@@ -1,0 +1,5 @@
+{
+  "buildCommand": "nuxt generate",
+  "installCommand": "npm install",
+  "outputDirectory": ".output/public"
+}

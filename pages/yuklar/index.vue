@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { Plus, Search, SearchX } from 'lucide-vue-next';
-import type { CargoListResponse } from '~/types/cargo';
+import type { Cargo, CargoListResponse } from '~/types/cargo';
 
 const { t, cityLabel, vehicleLabel, sortOptions } = useI18n();
 const route = useRoute();
@@ -84,22 +84,42 @@ const router = useRouter();
 const search = ref(String(route.query.qidiruv ?? ''));
 const sort = computed(() => String(route.query.saralash ?? 'new'));
 
-const apiQuery = computed(() => ({
-  q: String(route.query.qidiruv ?? ''),
-  from: String(route.query.dan ?? ''),
-  to: String(route.query.ga ?? ''),
-  vehicle: String(route.query.mashina ?? ''),
-  minWeight: String(route.query.ogirlik ?? ''),
-  sort: sort.value,
-}));
+// Filtering happens here rather than in the request query so that deep links
+// like /yuklar?dan=Toshkent reuse the prerendered payload instead of refetching.
+const SORTERS: Record<string, (a: Cargo, b: Cargo) => number> = {
+  new: (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
+  price_asc: (a, b) => a.price - b.price,
+  price_desc: (a, b) => b.price - a.price,
+  weight_desc: (a, b) => b.weightKg - a.weightKg,
+};
 
-const { data, pending } = await useFetch<CargoListResponse>('/api/cargos', {
-  query: apiQuery,
-  watch: [apiQuery],
+const { data, pending } = await useFetch<CargoListResponse>('/api/cargos');
+
+const items = computed(() => {
+  const q = String(route.query.qidiruv ?? '').trim().toLowerCase();
+  const from = String(route.query.dan ?? '').trim().toLowerCase();
+  const to = String(route.query.ga ?? '').trim().toLowerCase();
+  const vehicle = String(route.query.mashina ?? '').trim();
+  const minWeight = Number(route.query.ogirlik ?? 0);
+
+  let list = data.value?.items ?? [];
+  if (q) {
+    list = list.filter((c) =>
+      [c.title, c.cargoType, c.description, c.pickup.city, c.dropoff.city, c.owner.name]
+        .join(' ')
+        .toLowerCase()
+        .includes(q),
+    );
+  }
+  if (from) list = list.filter((c) => c.pickup.city.toLowerCase() === from || c.pickup.region.toLowerCase() === from);
+  if (to) list = list.filter((c) => c.dropoff.city.toLowerCase() === to || c.dropoff.region.toLowerCase() === to);
+  if (vehicle) list = list.filter((c) => c.requiredVehicleType === vehicle);
+  if (minWeight > 0) list = list.filter((c) => c.weightKg >= minWeight * 1000);
+
+  return [...list].sort(SORTERS[sort.value] ?? SORTERS.new);
 });
 
-const items = computed(() => data.value?.items ?? []);
-const total = computed(() => data.value?.total ?? 0);
+const total = computed(() => items.value.length);
 
 const activeFilterText = computed(() => {
   const parts: string[] = [];
